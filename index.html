@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPACE TCG - Jogo Simples de Naves Espaciais</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0e2a 0%, #1a1f3a 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid #4facfe;
+            box-shadow: 0 20px 60px rgba(79, 172, 254, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4facfe;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(79, 172, 254, 0.7);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #ccc;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        .game-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .game-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .game-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.6);
+        }
+
+        .game-btn:active {
+            transform: translateY(0);
+        }
+
+        .game-section {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 2px solid #43e97b;
+        }
+
+        .game-section h2 {
+            color: #43e97b;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .army-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .army-card {
+            background: linear-gradient(135deg, #1a1f3a 0%, #2a2f4a 100%);
+            border: 3px solid transparent;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .army-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
+            border-color: #4facfe;
+        }
+
+        .army-card.selected {
+            background: linear-gradient(135deg, #2a2f4a 0%, #3a3f5a 100%);
+            border-color: #ff6b6b;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        }
+
+        .army-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .army-name {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 8px;
+            color: #4facfe;
+        }
+
+        .army-description {
+            font-size: 0.9em;
+            color: #ccc;
+            line-height: 1.4;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #2a2f4a 0%, #3a3f5a 100%);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.4);
+            border-color: #4facfe;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .card-name {
+            color: #4facfe;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .card-type {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+        }
+
+        .card-stats {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+        }
+
+        .card-stat {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 3px 6px;
+            border-radius: 4px;
+        }
+
+        .card-cost {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 5px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .card-ability {
+            font-size: 0.75em;
+            color: #ccc;
+            line-height: 1.4;
+            font-style: italic;
+        }
+
+        .board-section {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #f9d423;
+        }
+
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .board-slot {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .board-slot:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .board-slot.selected {
+            border-color: #ff6b6b;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        }
+
+        .status-bar {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .status-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .energy-bar {
+            display: flex;
+            gap: 5px;
+        }
+
+        .energy-cell {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 2px solid #4facfe;
+            background: rgba(79, 172, 254, 0.3);
+        }
+
+        .energy-cell.filled {
+            background: #4facfe;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 30px;
+            border-left: 4px solid #43e97b;
+        }
+
+        .instructions h3 {
+            color: #43e97b;
+            margin-bottom: 15px;
+        }
+
+        .instructions ol {
+            text-align: left;
+            line-height: 2;
+            color: #ccc;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 12px;
+        }
+
+        .winner-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .winner-content {
+            background: linear-gradient(135deg, #ffd700 0%, #ffeaa7 100%);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            color: #1a1f3a;
+            max-width: 500px;
+            animation: confetti 3s ease-out;
+        }
+
+        .winner-content h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .winner-content p {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        @keyframes confetti {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .game-buttons {
+                flex-direction: column;
+            }
+
+            .army-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .cards-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+
+            .status-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 SPACE TCG - Jogo Simples</h1>
+        <p class="subtitle">Conflito Galáctico entre 5 Exércitos de Naves Espaciais</p>
+
+        <div class="game-buttons">
+            <button class="game-btn" onclick="startGame()">
+                🎮 Começar Jogo
+            </button>
+            <button class="game-btn" onclick="resetGame()">
+                🔄 Reiniciar Jogo
+            </button>
+        </div>
+
+        <div class="game-section" id="armySelection">
+            <h2>🌌 Escolhe o teu Exército</h2>
+            <div class="army-selector" id="armySelector">
+                <!-- Exércitos serão inseridos pelo JavaScript -->
+            </div>
+        </div>
+
+        <div class="game-section" id="cardSelection" style="display: none;">
+            <h2>📚 Cartas na Mão</h2>
+            <p id="handInfo" style="color: #ccc; margin-bottom: 20px;">Escolhe um exército primeiro!</p>
+            <div class="cards-grid" id="playerHand">
+                <!-- Cartas serão inseridas pelo JavaScript -->
+            </div>
+        </div>
+
+        <div class="game-section" id="gameBoard" style="display: none;">
+            <h2>🛡️ Tabuleiro de Jogo</h2>
+            <div class="status-bar">
+                <div class="status-item">🎯 Turno: <span id="turnCounter">1</span></div>
+                <div class="status-item">🔋 Energia: <span id="energyCounter">3</span>/5</div>
+                <div class="status-item">💰 Recursos: <span id="resourceCounter">0</span></div>
+                <div class="status-item">❤️ Saúde: <span id="healthCounter">20</span>/20</div>
+            </div>
+            <div class="board-grid" id="playerBoard">
+                <!-- Cartas no tabuleiro -->
+            </div>
+            <div class="board-grid" id="opponentBoard">
+                <p style="text-align: center; color: #ccc; grid-column: 1/-1;">Tabuleiro do Oponente</p>
+            </div>
+        </div>
+
+        <div class="game-section" id="gameInfo" style="display: none;">
+            <h2>📖 Informações do Jogo</h2>
+            <div class="instructions">
+                <h3>Como Jogar:</h3>
+                <ol>
+                    <li><strong>Escolhe um exército:</strong> Cada exército tem um bónus passivo único</li>
+                    <li><strong>Recebe 5 cartas:</strong> Cada carta tem um tipo e habilidade</li>
+                    <li><strong>Joga cartas:</strong> Usa energia (⚡) para jogar cartas no tabuleiro</li>
+                    <li><strong>Ataca:</strong> Combate por turnos com estratégia</li>
+                    <li><strong>Ganha:</strong> Reduz a saúde do oponente a 0!</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="game-section">
+            <h2>📖 Regras Rápidas</h2>
+            <div class="instructions">
+                <h3>Exércitos e Bónus:</h3>
+                <ul style="text-align: left; padding-left: 20px;">
+                    <li><strong>Vulcanis 🔥:</strong> +1 recurso por turno</li>
+                    <li><strong>Glacies ❄️:</strong> Máximo de energia +1</li>
+                    <li><strong>Silva 🌳:</strong> Saúde +1 por turno</li>
+                    <li><strong>Aether 💫:</strong> Recupera +1 energia por turno</li>
+                    <li><strong>Mechanos ⚙️:</strong> +2 recursos por turno</li>
+                </ul>
+                <h3 style="margin-top: 15px;">Tipos de Naves:</h3>
+                <ul style="text-align: left; padding-left: 20px;">
+                    <li><strong>Transporte 🚛:</strong> Gera recursos</li>
+                    <li><strong>Comando 🎯:</strong> Buffa outras naves</li>
+                    <li><strong>Combate ⚔️:</strong> Focado em dano</li>
+                    <li><strong>Exploração 🔍:</strong> Compra cartas extras</li>
+                    <li><strong>Construção 🏗️:</strong> Cura naves danificadas</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup de Vitória -->
+    <div class="winner-popup" id="winnerPopup" style="display: none;">
+        <div class="winner-content">
+            <h2>🏆 PARABÉNS!</h2>
+            <p id="winnerMessage">Jogador venceu a batalha galáctica!</p>
+            <button class="game-btn" onclick="document.getElementById('winnerPopup').style.display = 'none'" style="margin-top: 20px;">
+                🎮 Continuar Jogando
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Dados do jogo
+        const armies = [
+            {
+                id: 'vulcanis',
+                name: 'Vulcanis',
+                icon: '🔥',
+                color: '#ff6b6b',
+                bonus: 'Ganha +1 recurso no início de cada turno',
+                passive: '+1 recurso/turno',
+                cards: [
+                    { id: 1, name: 'Cruzeiro Estelar', type: 'Transporte 🚛', cost: 2, attack: 1, defense: 2, health: 4, ability: 'Gera +1 recurso no início do turno' },
+                    { id: 2, name: 'Nave de Comando', type: 'Comando 🎯', cost: 3, attack: 0, defense: 3, health: 5, ability: 'Todas as naves ganham +1 ataque' },
+                    { id: 3, name: 'Caça Vulcânico', type: 'Combate ⚔️', cost: 4, attack: 4, defense: 1, health: 3, ability: 'Pode atacar duas vezes' },
+                    { id: 4, name: 'Sonda Exploradora', type: 'Exploração 🔍', cost: 2, attack: 1, defense: 1, health: 3, ability: 'Compra uma carta extra por turno' },
+                    { id: 5, name: 'Estação de Reparos', type: 'Construção 🏗️', cost: 3, attack: 0, defense: 2, health: 6, ability: 'Cura 1 ponto de saúde a todas as naves' }
+                ]
+            },
+            {
+                id: 'glacies',
+                name: 'Glacies',
+                icon: '❄️',
+                color: '#43e97b',
+                bonus: 'Máximo de energia aumenta em 1',
+                passive: 'Máximo de energia +1',
+                cards: [
+                    { id: 6, name: 'Geleira Flutuante', type: 'Transporte 🚛', cost: 2, attack: 0, defense: 4, health: 5, ability: 'Máximo de energia +1' },
+                    { id: 7, name: 'Comando Glacial', type: 'Comando 🎯', cost: 4, attack: 1, defense: 3, health: 4, ability: 'Todas as naves ganham +1 defesa' },
+                    { id: 8, name: 'Destruidor de Gelo', type: 'Combate ⚔️', cost: 5, attack: 5, defense: 2, health: 4, ability: 'Ignora 2 pontos de defesa ao atacar' },
+                    { id: 9, name: 'Patrulha Polar', type: 'Exploração 🔍', cost: 2, attack: 2, defense: 1, health: 3, ability: 'Pode mover-se para qualquer posição' },
+                    { id: 10, name: 'Base de Congelamento', type: 'Construção 🏗️', cost: 3, attack: 0, defense: 3, health: 5, ability: 'Reduz custo de energia em 1 ponto' }
+                ]
+            },
+            {
+                id: 'silva',
+                name: 'Silva',
+                icon: '🌳',
+                color: '#f9d423',
+                bonus: 'Saúde aumenta em 1 ponto',
+                passive: 'Saúde +1/turno',
+                cards: [
+                    { id: 11, name: 'Nave Florestal', type: 'Transporte 🚛', cost: 2, attack: 1, defense: 2, health: 5, ability: 'Saúde máxima +1' },
+                    { id: 12, name: 'Comando Verde', type: 'Comando 🎯', cost: 3, attack: 0, defense: 2, health: 6, ability: 'Todas as naves regeneram 1 saúde no fim do turno' },
+                    { id: 13, name: 'Caça das Sombras', type: 'Combate ⚔️', cost: 4, attack: 3, defense: 3, health: 3, ability: 'Ganha +2 ataque se não for atacado este turno' },
+                    { id: 14, name: 'Explorador da Floresta', type: 'Exploração 🔍', cost: 2, attack: 1, defense: 1, health: 4, ability: 'Pode descartar uma carta para revelar o topo do deck do oponente' },
+                    { id: 15, name: 'Árvore de Vida', type: 'Construção 🏗️', cost: 3, attack: 0, defense: 1, health: 8, ability: 'Todas as naves ganham +1 saúde no início do turno' }
+                ]
+            },
+            {
+                id: 'aether',
+                name: 'Aether',
+                icon: '💫',
+                color: '#4facfe',
+                bonus: 'Recupera 1 energia no início de cada turno',
+                passive: 'Recupera +1 energia/turno',
+                cards: [
+                    { id: 16, name: 'Nave Éter', type: 'Transporte 🚛', cost: 2, attack: 1, defense: 1, health: 3, ability: 'Recupera 1 energia no início do turno' },
+                    { id: 17, name: 'Comando Celestial', type: 'Comando 🎯', cost: 4, attack: 0, defense: 2, health: 5, ability: 'Todas as naves ganham +1 energia disponível' },
+                    { id: 18, name: 'Caça Relâmpago', type: 'Combate ⚔️', cost: 5, attack: 6, defense: 1, health: 2, ability: 'Pode atacar imediatamente após ser jogado' },
+                    { id: 19, name: 'Sonda Estelar', type: 'Exploração 🔍', cost: 2, attack: 1, defense: 1, health: 3, ability: 'Pode comprar cartas do deck do oponente' },
+                    { id: 20, name: 'Portal de Energia', type: 'Construção 🏗️', cost: 3, attack: 0, defense: 2, health: 4, ability: 'Todas as naves ganham +1 ataque' }
+                ]
+            },
+            {
+                id: 'mechanos',
+                name: 'Mechanos',
+                icon: '⚙️',
+                color: '#6c5ce7',
+                bonus: 'Gera 2 recursos no início de cada turno',
+                passive: '+2 recursos/turno',
+                cards: [
+                    { id: 21, name: 'Cargueiro Mecânico', type: 'Transporte 🚛', cost: 2, attack: 1, defense: 3, health: 4, ability: 'Gera +2 recursos por turno' },
+                    { id: 22, name: 'Comando Robótico', type: 'Comando 🎯', cost: 4, attack: 2, defense: 4, health: 5, ability: 'Pode reparar 2 pontos de saúde em qualquer nave' },
+                    { id: 23, name: 'Tanque de Batalha', type: 'Combate ⚔️', cost: 6, attack: 5, defense: 5, health: 6, ability: 'Não pode ser removido do tabuleiro a menos que seja destruído' },
+                    { id: 24, name: 'Drone de Recolha', type: 'Exploração 🔍', cost: 2, attack: 0, defense: 2, health: 3, ability: 'Pode comprar cartas do cemitério sem custar energia' },
+                    { id: 25, name: 'Fábrica de Armas', type: 'Construção 🏗️', cost: 3, attack: 0, defense: 3, health: 5, ability: 'Reduz custo de todas as cartas de combate em 1 ponto' }
+                ]
+            }
+        ];
+
+        // Estado do jogo
+        let gameState = {
+            playerArmy: null,
+            opponentArmy: null,
+            playerHand: [],
+            playerBoard: [],
+            opponentBoard: [],
+            playerEnergy: 3,
+            playerMaxEnergy: 5,
+            playerResources: 0,
+            playerHealth: 20,
+            opponentHealth: 20,
+            currentTurn: 1,
+            gamePhase: 'setup',
+            selectedCard: null,
+            winner: null
+        };
+
+        // Inicializar seleção de exército
+        function initializeArmySelection() {
+            const selector = document.getElementById('armySelector');
+            selector.innerHTML = armies.map(army => `
+                <div class="army-card" onclick="selectArmy('${army.id}')" id="army-${army.id}">
+                    <div class="army-icon" style="color: ${army.color};">${army.icon}</div>
+                    <div class="army-name">${army.name}</div>
+                    <div class="army-description">${army.bonus}</div>
+                </div>
+            `).join('');
+        }
+
+        // Selecionar exército
+        function selectArmy(armyId) {
+            gameState.playerArmy = armies.find(a => a.id === armyId);
+            gameState.opponentArmy = armies.find(a => a.id !== armyId);
+
+            // Marcar exército selecionado
+            armies.forEach(a => {
+                document.getElementById(`army-${a.id}`).classList.remove('selected');
+            });
+            document.getElementById(`army-${armyId}`).classList.add('selected');
+
+            // Inicializar jogo
+            startNewGame();
+        }
+
+        // Começar novo jogo
+        function startNewGame() {
+            if (!gameState.playerArmy) {
+                alert('Por favor, escolhe um exército primeiro!');
+                return;
+            }
+
+            // Embaralhar cartas
+            const shuffledCards = [...gameState.playerArmy.cards]
+                .sort(() => Math.random() - 0.5);
+
+            // Dar 5 cartas iniciais
+            gameState.playerHand = shuffledCards.slice(0, 5);
+
+            // Reset estado
+            gameState.playerBoard = [];
+            gameState.opponentBoard = [];
+            gameState.playerEnergy = gameState.playerArmy.id === 'glacies' ? 4 : 3;
+            gameState.playerMaxEnergy = gameState.playerArmy.id === 'glacies' ? 6 : 5;
+            gameState.playerResources = 0;
+            gameState.playerHealth = 20;
+            gameState.opponentHealth = 20;
+            gameState.currentTurn = 1;
+            gameState.gamePhase = 'energy';
+            gameState.selectedCard = null;
+            gameState.winner = null;
+
+            // Atualizar interface
+            updateUI();
+
+            // Mostrar secções
+            document.getElementById('armySelection').style.display = 'none';
+            document.getElementById('cardSelection').style.display = 'block';
+            document.getElementById('gameBoard').style.display = 'block';
+            document.getElementById('gameInfo').style.display = 'block';
+        }
+
+        // Reiniciar jogo
+        function resetGame() {
+            gameState = {
+                playerArmy: null,
+                opponentArmy: null,
+                playerHand: [],
+                playerBoard: [],
+                opponentBoard: [],
+                playerEnergy: 3,
+                playerMaxEnergy: 5,
+                playerResources: 0,
+                playerHealth: 20,
+                opponentHealth: 20,
+                currentTurn: 1,
+                gamePhase: 'setup',
+                selectedCard: null,
+                winner: null
+            };
+
+            // Resetar seleção
+            armies.forEach(a => {
+                document.getElementById(`army-${a.id}`).classList.remove('selected');
+            });
+
+            // Mostrar seleção de exército
+            document.getElementById('armySelection').style.display = 'block';
+            document.getElementById('cardSelection').style.display = 'none';
+            document.getElementById('gameBoard').style.display = 'none';
+            document.getElementById('gameInfo').style.display = 'none';
+            document.getElementById('winnerPopup').style.display = 'none';
+        }
+
+        // Jogar carta
+        function playCard(card) {
+            if (gameState.playerEnergy < card.cost) {
+                alert('Não tens energia suficiente!');
+                return;
+            }
+
+            // Remover da mão
+            gameState.playerHand = gameState.playerHand.filter(c => c.id !== card.id);
+
+            // Adicionar ao tabuleiro
+            gameState.playerBoard.push({...card, health: card.health});
+
+            // Deduzir energia
+            gameState.playerEnergy -= card.cost;
+
+            // Aplicar habilidades especiais
+            applyCardAbility(card);
+
+            // Atualizar interface
+            updateUI();
+        }
+
+        // Aplicar habilidade da carta
+        function applyCardAbility(card) {
+            switch(card.type.split(' ')[0]) {
+                case 'Transporte':
+                    gameState.playerResources += 2;
+                    break;
+                case 'Comando':
+                    gameState.playerBoard.forEach(c => c.attack += 1);
+                    break;
+                case 'Combate':
+                    // Focado em dano
+                    break;
+                case 'Exploração':
+                    // Compra carta extra
+                    if (gameState.playerHand.length < 7) {
+                        const newCard = getRandomCard();
+                        gameState.playerHand.push(newCard);
+                    }
+                    break;
+                case 'Construção':
+                    // Cura naves danificadas
+                    gameState.playerBoard.forEach(c => {
+                        if (c.health < card.health) {
+                            c.health = Math.min(c.health + 2, card.health);
+                        }
+                    });
+                    break;
+            }
+        }
+
+        // Obter carta aleatória
+        function getRandomCard() {
+            const randomArmy = armies[Math.floor(Math.random() * armies.length)];
+            const randomCard = randomArmy.cards[Math.floor(Math.random() * randomArmy.cards.length)];
+            return {...randomCard};
+        }
+
+        // Terminar turno
+        function endTurn() {
+            // Aplicar bónus passivo do exército
+            applyArmyBonus();
+
+            // Reset energia
+            gameState.playerEnergy = gameState.playerMaxEnergy;
+
+            // Incrementar turno
+            gameState.currentTurn++;
+
+            // Verificar vitória
+            if (gameState.opponentHealth <= 0) {
+                gameState.winner = 'Jogador';
+                showWinner();
+                return;
+            }
+
+            // Turno do oponente (simplificado)
+            opponentTurn();
+
+            // Atualizar interface
+            updateUI();
+        }
+
+        // Aplicar bónus passivo do exército
+        function applyArmyBonus() {
+            switch(gameState.playerArmy.id) {
+                case 'vulcanis':
+                    gameState.playerResources += 1;
+                    break;
+                case 'glacies':
+                    // Máximo de energia já aumentado
+                    break;
+                case 'silva':
+                    gameState.playerHealth = Math.min(gameState.playerHealth + 1, 20);
+                    break;
+                case 'aether':
+                    gameState.playerEnergy = Math.min(gameState.playerEnergy + 1, gameState.playerMaxEnergy);
+                    break;
+                case 'mechanos':
+                    gameState.playerResources += 2;
+                    break;
+            }
+        }
+
+        // Turno do oponente (simplificado)
+        function opponentTurn() {
+            // Oponente joga uma carta aleatória
+            if (gameState.opponentBoard.length < 5 && Math.random() > 0.5) {
+                const availableCards = gameState.opponentArmy.cards.filter(card => 
+                    card.cost <= 3 && !gameState.playerHand.some(c => c.id === card.id)
+                );
+                
+                if (availableCards.length > 0) {
+                    const cardToPlay = availableCards[Math.floor(Math.random() * availableCards.length)];
+                    gameState.opponentBoard.push({...cardToPlay, health: cardToPlay.health});
+                }
+            }
+
+            // Oponente ataca
+            if (gameState.opponentBoard.length > 0 && Math.random() > 0.3) {
+                const attacker = gameState.opponentBoard[0];
+                if (gameState.playerBoard.length > 0) {
+                    const target = gameState.playerBoard[0];
+                    const damage = Math.max(0, attacker.attack - (target.defense || 0));
+                    target.health = Math.max(0, target.health - damage);
+                } else {
+                    // Ataca jogador diretamente
+                    gameState.playerHealth -= Math.max(1, attacker.attack - 2);
+                }
+            }
+
+            // Verificar vitória do oponente
+            if (gameState.playerHealth <= 0) {
+                gameState.winner = 'Oponente';
+                showWinner();
+            }
+        }
+
+        // Mostrar vencedor
+        function showWinner() {
+            const popup = document.getElementById('winnerPopup');
+            const message = document.getElementById('winnerMessage');
+            
+            if (gameState.winner === 'Jogador') {
+                message.innerHTML = '🏆 <strong>Parabéns!</strong><br>Derrotaste o oponente na batalha galáctica!';
+            } else {
+                message.innerHTML = '💥 <strong>Derrota!</strong><br>O oponente venceu a batalha...';
+            }
+            
+            popup.style.display = 'flex';
+        }
+
+        // Atualizar interface
+        function updateUI() {
+            // Atualizar counters
+            document.getElementById('turnCounter').textContent = gameState.currentTurn;
+            document.getElementById('energyCounter').textContent = gameState.playerEnergy;
+            document.getElementById('resourceCounter').textContent = gameState.playerResources;
+            document.getElementById('healthCounter').textContent = gameState.playerHealth;
+
+            // Atualizar mão de cartas
+            const handElement = document.getElementById('playerHand');
+            const handInfo = document.getElementById('handInfo');
+            
+            if (gameState.playerHand.length === 0) {
+                handInfo.textContent = '📚 A tua mão está vazia! Compra mais cartas.';
+            } else {
+                handInfo.textContent = `📚 Cartas na mão: ${gameState.playerHand.length}/7`;
+            }
+            
+            handElement.innerHTML = gameState.playerHand.map(card => `
+                <div class="card" onclick="playCard(${JSON.stringify(card)})">
+                    <div class="card-header">
+                        <span class="card-name">${card.name}</span>
+                        <span class="card-type">${card.type}</span>
+                    </div>
+                    <div class="card-stats">
+                        <span class="card-stat">🔥 ${card.attack}</span>
+                        <span class="card-stat">⚡ ${card.defense}</span>
+                    </div>
+                    <div class="card-cost">Custo: ${card.cost} ⚡</div>
+                    <div class="card-ability">${card.ability}</div>
+                </div>
+            `).join('');
+
+            // Atualizar tabuleiro
+            const playerBoardElement = document.getElementById('playerBoard');
+            playerBoardElement.innerHTML = gameState.playerBoard.map(card => `
+                <div class="board-slot">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-name">${card.name}</span>
+                            <span class="card-type">${card.type}</span>
+                        </div>
+                        <div class="card-stats">
+                            <span class="card-stat">🔥 ${card.attack}</span>
+                            <span class="card-stat">⚡ ${card.defense}</span>
+                            <span class="card-stat">❤️ ${card.health}</span>
+                        </div>
+                        <div class="card-cost">Custo: ${card.cost} ⚡</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Verificar vitória
+            if (gameState.winner) {
+                showWinner();
+            }
+        }
+
+        // Inicializar quando a página carrega
+        window.addEventListener('load', initializeArmySelection);
+    </script>
+</body>
+</html>
